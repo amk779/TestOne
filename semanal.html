@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operator Check • Treino Híbrido</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Paleta Militar/Tática (Clara para o form) */
+      --bg: #F0F2F0;
+      --card: #FFFFFF;
+      --text-main: #1F2937;
+      --text-muted: #6B7280;
+      --tactical-green: #354F52; /* Verde Militar Escuro */
+      --tactical-light: #CAD2C5;
+      --accent: #52796F;         
+      --border: #E5E7EB;
+      --radius: 8px;
+
+      /* Paleta Dashboard (Escura para o print) */
+      --dash-bg: #1A1F24;
+      --dash-card: #242A30;
+      --dash-accent: #4ADE80; /* Verde Neon Tático */
+      --dash-text: #F9FAFB;
+      --dash-muted: #9CA3AF;
+    }
+
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px 12px; /* Padding lateral reduzido para mobile */
+    }
+
+    .container {
+      width: 100%;
+      max-width: 550px; /* Levemente mais estreito para focar no mobile */
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* --- Cabeçalho Tático --- */
+    header { text-align: center; margin-bottom: 10px; }
+    .badge {
+      display: inline-block; background: var(--tactical-green); color: #fff;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; padding: 4px 12px;
+      border-radius: 4px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 1.5rem; font-weight: 800; margin: 0; letter-spacing: -0.5px;
+      text-transform: uppercase; color: var(--tactical-green);
+    }
+    .subtitle { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* --- Cartão Principal (Formulário) --- */
+    .card {
+      background: var(--card); border-radius: var(--radius); padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border);
+    }
+
+    /* Inputs e Labels */
+    .input-group { margin-bottom: 20px; }
+    label {
+      display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+      color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; font-weight: 700;
+    }
+    input[type="text"] {
+      width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: var(--radius);
+      font-family: 'Inter', sans-serif; font-size: 1rem; background: #FAFAFA; transition: 0.2s;
+    }
+    input[type="text"]:focus { border-color: var(--tactical-green); background: #fff; }
+
+    /* Seções e Grid de Checks */
+    .section-title {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700;
+      color: var(--tactical-green); border-bottom: 2px solid var(--border);
+      padding-bottom: 8px; margin: 24px 0 12px 0; text-transform: uppercase;
+      display: flex; justify-content: space-between;
+    }
+    .check-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px;
+    }
+    .check-item input[type="checkbox"] { display: none; }
+    .check-item label {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 14px 8px; cursor: pointer; transition: all 0.2s ease; height: 100%; margin: 0;
+    }
+    .check-item span.code {
+      font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text-main);
+    }
+    .check-item span.desc {
+      font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase;
+    }
+    /* Estado Marcado */
+    .check-item input:checked + label {
+      background: var(--tactical-green); border-color: var(--tactical-green);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .check-item input:checked + label .code, .check-item input:checked + label .desc { color: white; }
+
+    /* Barra de Progresso do Form */
+    .progress-container {
+      background: #E5E7EB; border-radius: 99px; height: 6px; width: 100%; margin: 20px 0; overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%; background: var(--tactical-green); width: 0%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Botão */
+    button {
+      width: 100%; padding: 16px; border-radius: var(--radius); border: none;
+      font-size: 1rem; font-weight: 600; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 8px;
+      background: var(--tactical-green); color: #fff; transition: transform 0.1s, background 0.2s;
+      font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    button:active { transform: scale(0.98); }
+    button:hover { background: var(--accent); }
+
+    /* Área de Feedback (WhatsApp) */
+    .result-area {
+      margin-top: 16px; background: #F9FAFB; border: 1px dashed var(--border);
+      border-radius: var(--radius); padding: 16px; font-size: 0.85rem; color: var(--text-muted);
+      display: none; /* Escondido inicialmente */
+    }
+    .result-area.active { display: block; animation: fadeIn 0.3s; }
+
+    /* =========================================
+       NOVO: DASHBOARD PARA PRINT (Instagram Fit)
+       ========================================= */
+    .share-card {
+      display: none; /* Oculto até gerar */
+      background: linear-gradient(135deg, var(--dash-bg) 0%, var(--dash-card) 100%);
+      border-radius: 16px; /* Bordas mais arredondadas para estilo App */
+      padding: 32px 24px;
+      color: var(--dash-text);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .share-card.visible { display: block; animation: slideUp 0.4s ease-out; }
+
+    /* Efeito de luz no topo do card */
+    .share-card::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, transparent, var(--dash-accent), transparent);
+        opacity: 0.7;
+    }
+
+    .share-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+    }
+    .brand-tag {
+      font-family: 'JetBrains Mono', monospace; font-weight: 800; letter-spacing: 1px;
+      color: var(--dash-accent); text-transform: uppercase; font-size: 0.9rem;
+    }
+    .week-display {
+      font-family: 'JetBrains Mono', monospace; color: var(--dash-muted); font-size: 0.8rem; text-transform: uppercase;
+    }
+
+    /* Métrica Principal */
+    .main-metric { text-align: center; margin-bottom: 36px; }
+    .metric-label {
+      display: block; color: var(--dash-muted); font-size: 0.9rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;
+    }
+    .metric-value {
+      font-family: 'JetBrains Mono', sans-serif; font-size: 5rem; font-weight: 800;
+      line-height: 1; color: var(--dash-text);
+      text-shadow: 0 0 25px rgba(74, 222, 128, 0.2); /* Glow sutil */
+    }
+    .metric-percentage { color: var(--dash-accent); font-size: 2.5rem; }
+
+    /* Badge de Status no Print */
+    .status-badge-large {
+        display: inline-block; margin-top: 12px;
+        padding: 6px 16px; background: rgba(74, 222, 128, 0.15); color: var(--dash-accent);
+        font-family: 'JetBrains Mono', monospace; font-weight: 700; border-radius: 4px;
+        text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--dash-accent);
+    }
+
+    /* Grid de Detalhes */
+    .metrics-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;
+    }
+    .metric-box {
+      background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .box-label {
+        display: flex; align-items: center; gap: 8px; font-size: 0.8rem;
+        color: var(--dash-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 8px;
+    }
+    .box-value {
+        font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 700; color: var(--dash-text);
+    }
+    /* Mini barras de progresso no card de print */
+    .mini-progress {
+        height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 12px; overflow:hidden;
+    }
+    .mini-bar-fill { height: 100%; background: var(--dash-accent); width: 0%; transition: width 1s ease; }
+
+    .share-footer {
+        text-align: center; color: var(--dash-muted); font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem; margin-top: 20px; opacity: 0.7;
+    }
+
+    /* Utilitário para o usuário saber que é para tirar print */
+    .screenshot-hint {
+      text-align: center; font-size: 0.8rem; color: var(--text-muted); margin: 16px 0 8px 0;
+      font-family: 'JetBrains Mono', monospace; text-transform: uppercase; display: none;
+    }
+    .screenshot-hint.visible { display: block; }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <span class="badge">HYBRID // SYSTEM</span>
+      <h1>Check Semanal</h1>
+      <div class="subtitle">Controle de Disciplina & Performance</div>
+    </header>
+
+    <div class="card">
+      <div class="input-group">
+        <label for="weekInput">Identificação da Semana (Ex: Sem 07 / 01-07 Fev)</label>
+        <input type="text" id="weekInput" placeholder="Digite a semana..." autocomplete="off">
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <div class="section-title">
+        <span>Força (Strength)</span> <span>5 SESSÕES</span>
+      </div>
+      <div class="check-grid strength-group">
+        <div class="check-item"><input type="checkbox" id="tA" onchange="updateFormProgress()"><label for="tA"><span class="code">A</span><span class="desc">Treino</span></label></div>
+        <div class="check-item"><input type="checkbox" id="tB" onchange="updateFormProgress()"><label for="tB"><span class="code">B</span><span class="desc">Treino</span></label></div>
+        <div class="check-item"><input type="checkbox" id="tC" onchange="updateFormProgress()"><label for="tC"><span class="code">C</span><span class="desc">Treino</span></label></div>
+        <div class="check-item"><input type="checkbox" id="tD" onchange="updateFormProgress()"><label for="tD"><span class="code">D</span><span class="desc">Treino</span></label></div>
+        <div class="check-item"><input type="checkbox" id="tE" onchange="updateFormProgress()"><label for="tE"><span class="code">E</span><span class="desc">Treino</span></label></div>
+      </div>
+
+      <div class="section-title">
+        <span>Corrida (Endurance)</span> <span>3 SESSÕES</span>
+      </div>
+      <div class="check-grid run-group">
+        <div class="check-item"><input type="checkbox" id="run1" onchange="updateFormProgress()"><label for="run1"><span class="code">D1</span><span class="desc">Run</span></label></div>
+        <div class="check-item"><input type="checkbox" id="run2" onchange="updateFormProgress()"><label for="run2"><span class="code">D2</span><span class="desc">Run</span></label></div>
+        <div class="check-item"><input type="checkbox" id="run3" onchange="updateFormProgress()"><label for="run3"><span class="code">D3</span><span class="desc">Run</span></label></div>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid var(--border); margin: 24px 0;">
+
+      <button onclick="processResults()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+        GERAR RELATÓRIO
+      </button>
+
+      <div id="resultArea" class="result-area"></div>
+
+    </div>
+
+    <div class="screenshot-hint" id="screenshotHint">
+      ⬇️ Tire print do cartão abaixo para postar ⬇️
+    </div>
+
+    <div class="share-card" id="shareCard">
+        <div class="share-header">
+            <span class="brand-tag">HYBRID // OPS</span>
+            <span class="week-display" id="shareWeekTxt">SEMANA --</span>
+        </div>
+        
+        <div class="main-metric">
+            <span class="metric-label">Consistência Semanal</span>
+            <div class="metric-value">
+                <span id="sharePercentNumber">0</span><span class="metric-percentage">%</span>
+            </div>
+            <div class="status-badge-large" id="shareStatusBadge">ANALISANDO...</div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="box-label">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path></svg>
+                    STRENGTH
+                </div>
+                <div class="box-value" id="shareStrengthVal">0/5</div>
+                <div class="mini-progress"><div class="mini-bar-fill" id="shareStrengthBar"></div></div>
+            </div>
+            <div class="metric-box">
+                <div class="box-label">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                    ENDURANCE
+                </div>
+                <div class="box-value" id="shareRunVal">0/3</div>
+                <div class="mini-progress"><div class="mini-bar-fill" id="shareRunBar"></div></div>
+            </div>
+        </div>
+
+        <div class="share-footer">
+            #DISCIPLINEISFREEDOM #HYBRIDTRAINING
+        </div>
+    </div>
+
+  </div>
+
+  <script>
+    // 1. Mantém a barra de progresso do formulário atualizada
+    function updateFormProgress() {
+      const allChecks = document.querySelectorAll('input[type="checkbox"]');
+      const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+      const percent = (checked.length / allChecks.length) * 100;
+      document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    // 2. Função Principal acionada pelo botão
+    function processResults() {
+      // Coleta dados
+      const weekInputVal = document.getElementById('weekInput').value.trim();
+      const weekTxt = weekInputVal ? weekInputVal.toUpperCase() : "SEMANA NÃO INFORMADA";
+      
+      const strengthTotal = 5;
+      const strengthChecked = document.querySelectorAll('.strength-group input:checked').length;
+      
+      const runTotal = 3;
+      const runChecked = document.querySelectorAll('.run-group input:checked').length;
+
+      const totalChecks = strengthTotal + runTotal;
+      const totalDone = strengthChecked + runChecked;
+      const finalPercent = Math.round((totalDone / totalChecks) * 100);
+
+      // --- A. Gera e Copia Texto do WhatsApp ---
+      generateWhatsAppText(weekTxt, totalDone, totalChecks, finalPercent);
+
+      // --- B. Popula e Mostra o Cartão de Print (Instagram Style) ---
+      populateShareCard(weekTxt, strengthChecked, strengthTotal, runChecked, runTotal, finalPercent);
+    }
+
+    // Função auxiliar para o Cartão de Print
+    function populateShareCard(week, sDone, sTotal, rDone, rTotal, percent) {
+        // Mostra elementos ocultos
+        document.getElementById('shareCard').classList.add('visible');
+        document.getElementById('screenshotHint').classList.add('visible');
+
+        // Preenche dados básicos
+        document.getElementById('shareWeekTxt').innerText = week;
+        
+        // Animação do número principal
+        animateValue('sharePercentNumber', 0, percent, 1000);
+
+        // Define Status Badge
+        const badge = document.getElementById('shareStatusBadge');
+        if (percent === 100) { badge.innerText = "ELITE // CUMPRIDO"; badge.style.borderColor = "#4ADE80"; badge.style.color = "#4ADE80"; }
+        else if (percent >= 80) { badge.innerText = "OPERACIONAL"; badge.style.borderColor = "#4ADE80"; badge.style.color = "#4ADE80"; }
+        else if (percent >= 60) { badge.innerText = "EM PROGRESSO"; badge.style.borderColor = "#FBBF24"; badge.style.color = "#FBBF24"; }
+        else { badge.innerText = "ATENÇÃO // RISCO"; badge.style.borderColor = "#F87171"; badge.style.color = "#F87171"; }
+
+        // Preenche caixas de detalhes
+        document.getElementById('shareStrengthVal').innerText = `${sDone}/${sTotal}`;
+        document.getElementById('shareRunVal').innerText = `${rDone}/${rTotal}`;
+
+        // Define largura das mini barras com um pequeno delay para a animação CSS funcionar
+        setTimeout(() => {
+            document.getElementById('shareStrengthBar').style.width = (sDone/sTotal*100) + '%';
+            document.getElementById('shareRunBar').style.width = (rDone/rTotal*100) + '%';
+        }, 100);
+
+        // Scroll suave até o cartão de share para facilitar o print
+        document.getElementById('shareCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Efeito de contagem numérica para o cartão de share
+    function animateValue(id, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            document.getElementById(id).innerHTML = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Função auxiliar para o WhatsApp (mantida do padrão anterior)
+    function generateWhatsAppText(week, done, total, percent) {
+      const filledBars = Math.round((percent / 100) * 10); 
+      const visualBar = '▓'.repeat(filledBars) + '░'.repeat(10 - filledBars);
+
+      let status = "⚠️ ATENÇÃO";
+      if (percent === 100) status = "🏆 MISSÃO CUMPRIDA";
+      else if (percent >= 80) status = "✅ OPERACIONAL";
+      
+      const text = 
+`*CHECK SEMANAL • TREINO HÍBRIDO* 🪖
+📅 ${week}
+
+📊 *STATUS:* ${status}
+Progresso: ${done}/${total}
+${visualBar} ${percent}%
+
+*DETALHAMENTO:*
+🏋️ Força: ${getCheckStatus('tA')}${getCheckStatus('tB')}${getCheckStatus('tC')}${getCheckStatus('tD')}${getCheckStatus('tE')}
+🏃 Corrida: ${getCheckStatus('run1')}${getCheckStatus('run2')}${getCheckStatus('run3')}
+
+_Disciplina é liberdade._`;
+
+      // Tenta copiar
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => showFeedback()).catch(err => manualCopy(text));
+      } else { manualCopy(text); }
+    }
+
+    function manualCopy(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text; document.body.appendChild(textArea); textArea.select();
+        document.execCommand("copy"); document.body.removeChild(textArea);
+        showFeedback();
+    }
+
+    function getCheckStatus(id) { return document.getElementById(id).checked ? "✅" : "❌"; }
+    function showFeedback() {
+      const area = document.getElementById('resultArea');
+      area.innerHTML = "✅ <strong>Relatório copiado!</strong> Cole no WhatsApp.<br>⬇️ <strong>Abaixo:</strong> Versão para print do Instagram.";
+      area.classList.add('active');
+    }
+  </script>
+</body>
+</html>
